@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+
+function multi_stage_form_menu() {
+
+  $items['user/%user/subscriptions'] = array(
+    'title' => 'Subscriptions',
+    'page callback' => 'multi_stage_form_form_page',
+    'access arguments' => array(1),
+    'access callback' => 'user_edit_access',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return ($items);
+}
+
+function multi_stage_form_form_page() {
+
+  module_load_include('inc','user','user.pages');
+
+  global $user;
+
+  $user_fields = user_load($user->uid);
+
+  $output = drupal_get_form('user_profile_form', $user_fields, 'account', 'custom');
+
+  return $output;
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+
+function multi_stage_form_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+
+  $custom_fields = array('field_user_get_news','field_user_news_categories');
+
+  $required_fields = array('form_id', 'form_token', 'id');
+
+  if (in_array('custom', $form_state['build_info']['args']))
+  {
+    $fields = array_diff(element_children($form), $custom_fields, $required_fields);
+
+    foreach ($fields as $field)
+    {
+      $form[$field]['#access'] = FALSE;
+    }
+
+  }
+  else
+  {
+    $fields = array_diff($custom_fields, $required_fields);
+
+    foreach ($fields as $field)
+    {
+      $form[$field]['#access'] = FALSE;
+    }
+  }
+}

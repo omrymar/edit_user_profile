@@ -1,0 +1,4 @@
+name = My first multistage form
+description = My first drupal multistage form registration
+package = custom module
+core = 7.x
